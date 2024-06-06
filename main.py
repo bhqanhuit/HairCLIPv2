@@ -79,11 +79,10 @@ with open('datasets/testPair.txt') as file:
         source, shape = line.split(' ')
         print(source, shape)
     
-        src_name = source.split('.')[0]
+        src_name = source.split('.')[0] + '_70'
         transform = transforms.Compose([transforms.ToTensor(),transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])])
         source_im = transform(Image.open(f'{opts.src_img_dir}/{src_name}.png')).to('cuda')
         shape_im = transform(Image.open(f'{opts.ref_img_dir}/{shape}')).to('cuda')
-
         image_transform = transforms.Compose([transforms.ToTensor(),transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])])
 
         if not os.path.isfile(os.path.join(opts.src_latent_dir, f"{src_name}.npz")):
@@ -91,6 +90,8 @@ with open('datasets/testPair.txt') as file:
             save_latent_path = os.path.join(opts.src_latent_dir, f'{src_name}.npz')
             np.savez(save_latent_path, latent_in=inverted_latent_w_plus.detach().cpu().numpy(),
                         latent_F=inverted_latent_F.detach().cpu().numpy())
+            
+
         src_latent = torch.from_numpy(np.load(f'{opts.src_latent_dir}/{src_name}.npz')['latent_in']).cuda()
         src_feature = torch.from_numpy(np.load(f'{opts.src_latent_dir}/{src_name}.npz')['latent_F']).cuda()
         src_image = image_transform(Image.open(f'{opts.src_img_dir}/{src_name}.png').convert('RGB')).unsqueeze(0).cuda()
@@ -102,8 +103,8 @@ with open('datasets/testPair.txt') as file:
 
         start_time = time.time()
         print("--- %s seconds ---" % (time.time() - start_time))
-        save_image(edited_hairstyle_img.squeeze(), 'test_outputs/' + str(cnt).zfill(10) + '.jpg', normalize=True)
-        save_image(torch.cat([edited_hairstyle_img.squeeze(), source_im, shape_im], dim=2), 'test_outputsFull/' + str(cnt).zfill(10) + '.png', normalize=True)
+        save_image(edited_hairstyle_img.squeeze(), 'test_outputs_clip_face/' + str(cnt).zfill(10) + '.jpg', normalize=True)
+        save_image(torch.cat([edited_hairstyle_img.squeeze(), source_im, shape_im], dim=2), 'test_outputsFull_clip_face/' + str(cnt).zfill(10) + '.png', normalize=True)
         # if (cnt > 5): break
 
             
