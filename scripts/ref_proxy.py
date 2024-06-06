@@ -40,7 +40,7 @@ class RefProxy(torch.nn.Module):
         hairstyle_img_path = f'{self.opts.ref_img_dir}/{hairstyle_ref_name}'
         ref_PIL = Image.open(hairstyle_img_path).convert('RGB')
         ref_img = image_transform(ref_PIL).unsqueeze(0).cuda()
-
+        print(f"{os.path.splitext(hairstyle_ref_name)[0]}.npy")
         if not os.path.isfile(os.path.join(self.opts.ref_latent_dir, f"{os.path.splitext(hairstyle_ref_name)[0]}.npy")):
             inverted_wplus_code = self.ii2s.invert_image_in_W(image_path=hairstyle_img_path)
             save_latent = inverted_wplus_code.detach().cpu().numpy()

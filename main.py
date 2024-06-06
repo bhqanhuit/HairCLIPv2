@@ -77,9 +77,10 @@ with open('datasets/testPair.txt') as file:
     for line in lines:
         cnt += 1
         source, shape = line.split(' ')
+        shape = shape.split('.')[0] + '_70.png'
         print(source, shape)
     
-        src_name = source.split('.')[0] + '_70'
+        src_name = source.split('.')[0]
         transform = transforms.Compose([transforms.ToTensor(),transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])])
         source_im = transform(Image.open(f'{opts.src_img_dir}/{src_name}.png')).to('cuda')
         shape_im = transform(Image.open(f'{opts.ref_img_dir}/{shape}')).to('cuda')
@@ -103,8 +104,8 @@ with open('datasets/testPair.txt') as file:
 
         start_time = time.time()
         print("--- %s seconds ---" % (time.time() - start_time))
-        save_image(edited_hairstyle_img.squeeze(), 'test_outputs_clip_face/' + str(cnt).zfill(10) + '.jpg', normalize=True)
-        save_image(torch.cat([edited_hairstyle_img.squeeze(), source_im, shape_im], dim=2), 'test_outputsFull_clip_face/' + str(cnt).zfill(10) + '.png', normalize=True)
+        save_image(edited_hairstyle_img.squeeze(), 'test_outputs_clip_hair/' + str(cnt).zfill(10) + '.jpg', normalize=True)
+        save_image(torch.cat([edited_hairstyle_img.squeeze(), source_im, shape_im], dim=2), 'test_outputsFull_clip_hair/' + str(cnt).zfill(10) + '.png', normalize=True)
         # if (cnt > 5): break
 
             
