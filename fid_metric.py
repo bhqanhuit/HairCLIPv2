@@ -59,7 +59,7 @@ def main():
     
     # datasets['Same_Scale'] = parallel_load_images('test_outputs_clip', list_image_files('test_outputs_clip'))
     datasets['Face_DownScale_face'] = parallel_load_images('test_outputs_clip_face', list_image_files('test_outputs_clip_face'))
-
+    datasets['Face_DownScale_hair'] = parallel_load_images('test_outputs_clip_hair', list_image_files('test_outputs_clip_hair'))
 
     # datasets['Same_Scale'] = parallel_load_images('test_outputs', list_image_files('test_outputs'))
     # datasets['Hair_DownScale'] = parallel_load_images('test_outputs_dif_hair', list_image_files('test_outputs_dif_hair'))

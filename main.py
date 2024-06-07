@@ -19,6 +19,7 @@ from utils.options import Options
 from torchvision.utils import save_image
 import torchvision.transforms as T
 import time
+from ScaleImage import image_scale
 
 opts = Options().parse()
 
@@ -68,8 +69,6 @@ text_proxy = TextProxy(opts, g_ema, seg, mean_latent_code)
 ref_proxy = RefProxy(opts, g_ema, seg, ii2s)
 sketch_proxy = SketchProxy(g_ema, mean_latent_code, opts.sketch_path)
 color_proxy = ColorProxy(opts, g_ema, seg)
-
-
 
 with open('datasets/testPair.txt') as file:
     lines = [line.rstrip() for line in file]

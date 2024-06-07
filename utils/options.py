@@ -16,9 +16,9 @@ class Options:
 		self.parser.add_argument('--ffhq_pca_path', default="pretrained_models/ffhq_PCA.npz", type=str, help='Path to FFHQ PCA')
 
 		# arguments for image and latent dir path
-		self.parser.add_argument('--src_img_dir', default="datasets/FFHQ_TrueScale", type=str, help='Folder of source image')
+		self.parser.add_argument('--src_img_dir', default="datasets/FFHQ_Resized", type=str, help='Folder of source image')
 		self.parser.add_argument('--src_latent_dir', default="test_images/src_F", type=str, help='Folder of source latent')
-		self.parser.add_argument('--ref_img_dir', default="datasets/FFHQ_Resized", type=str, help='Folder of reference image')
+		self.parser.add_argument('--ref_img_dir', default="datasets/FFHQ_TrueScale", type=str, help='Folder of reference image')
 		self.parser.add_argument('--ref_latent_dir', default="test_images/ref_latent", type=str, help='Folder of reference latent')
 
 		# arguments for embedding
