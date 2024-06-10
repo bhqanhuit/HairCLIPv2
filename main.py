@@ -76,25 +76,39 @@ with open('datasets/testPair.txt') as file:
     for line in lines:
         cnt += 1
         source, shape = line.split(' ')
-        shape = shape.split('.')[0] + '_70.png'
-        print(source, shape)
-    
-        src_name = source.split('.')[0]
+        src_name = source.split('.')[0] + '_70'
+        print(src_name, shape)
+
         transform = transforms.Compose([transforms.ToTensor(),transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])])
-        source_im = transform(Image.open(f'{opts.src_img_dir}/{src_name}.png')).to('cuda')
+        source_im = image_scale(f'{opts.ref_img_dir}/{shape}', f'{opts.src_img_dir}/{src_name}.png', src_name, cnt)
+        source_im.save('datasets/FFHQ_UpScale/' + src_name + '.png')
+        print(type(source_im))
+        src_UpScale = 'datasets/FFHQ_UpScale/' + src_name + '.png'
+        
+    
+        # source_im = transform(Image.open(f'{opts.src_img_dir}/{src_name}.png')).to('cuda')
+        source_im = transform(Image.open(src_UpScale)).to('cuda')
         shape_im = transform(Image.open(f'{opts.ref_img_dir}/{shape}')).to('cuda')
+
         image_transform = transforms.Compose([transforms.ToTensor(),transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])])
 
+
+        # if not os.path.isfile(os.path.join(opts.src_latent_dir, f"{src_name}.npz")):
+        #     inverted_latent_w_plus, inverted_latent_F = ii2s.invert_image_in_FS(image_path=f'{opts.src_img_dir}/{src_name}.png')
+        #     save_latent_path = os.path.join(opts.src_latent_dir, f'{src_name}.npz')
+        #     np.savez(save_latent_path, latent_in=inverted_latent_w_plus.detach().cpu().numpy(),
+        #                 latent_F=inverted_latent_F.detach().cpu().numpy())
+            
         if not os.path.isfile(os.path.join(opts.src_latent_dir, f"{src_name}.npz")):
-            inverted_latent_w_plus, inverted_latent_F = ii2s.invert_image_in_FS(image_path=f'{opts.src_img_dir}/{src_name}.png')
+            inverted_latent_w_plus, inverted_latent_F = ii2s.invert_image_in_FS(image_path=src_UpScale)
             save_latent_path = os.path.join(opts.src_latent_dir, f'{src_name}.npz')
             np.savez(save_latent_path, latent_in=inverted_latent_w_plus.detach().cpu().numpy(),
                         latent_F=inverted_latent_F.detach().cpu().numpy())
-            
 
         src_latent = torch.from_numpy(np.load(f'{opts.src_latent_dir}/{src_name}.npz')['latent_in']).cuda()
         src_feature = torch.from_numpy(np.load(f'{opts.src_latent_dir}/{src_name}.npz')['latent_F']).cuda()
-        src_image = image_transform(Image.open(f'{opts.src_img_dir}/{src_name}.png').convert('RGB')).unsqueeze(0).cuda()
+        # src_image = image_transform(Image.open(f'{opts.src_img_dir}/{src_name}.png').convert('RGB')).unsqueeze(0).cuda()
+        src_image = image_transform(Image.open(src_UpScale).convert('RGB')).unsqueeze(0).cuda()
         input_mask = torch.argmax(seg(src_image)[1], dim=1).long().clone().detach()
 
         
@@ -103,8 +117,9 @@ with open('datasets/testPair.txt') as file:
 
         start_time = time.time()
         print("--- %s seconds ---" % (time.time() - start_time))
-        save_image(edited_hairstyle_img.squeeze(), 'test_outputs_clip_hair/' + str(cnt).zfill(10) + '.jpg', normalize=True)
-        save_image(torch.cat([edited_hairstyle_img.squeeze(), source_im, shape_im], dim=2), 'test_outputsFull_clip_hair/' + str(cnt).zfill(10) + '.png', normalize=True)
-        # if (cnt > 5): break
+        save_image(edited_hairstyle_img.squeeze(), 'test_outputs_clip_face_upscale/' + str(cnt).zfill(10) + '.jpg', normalize=True)
+        save_image(torch.cat([edited_hairstyle_img.squeeze(), source_im, shape_im], dim=2), 'test_outputsFull_clip_face_upscale/' + str(cnt).zfill(10) + '.png', normalize=True)
+
+        # exit()
 
             

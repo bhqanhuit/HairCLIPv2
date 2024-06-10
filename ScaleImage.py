@@ -4,9 +4,9 @@ import numpy as np
 from torchvision.utils import save_image
 import torch
 import torchvision.transforms as transforms
-from utils.options import Options
 
 def get_facial_landmarks(image):
+    # Initialize dlib's face detector and facial landmark predictor
     detector = dlib.get_frontal_face_detector()
     predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")  # Download this file from dlib's website
 
@@ -20,28 +20,34 @@ def get_facial_landmarks(image):
         print("No faces detected")
         return None
 
+    # Assume only one face in the image
     face = faces[0]
     
+    # Determine facial landmarks
     shape = predictor(gray, face)
     landmarks = np.array([[shape.part(i).x, shape.part(i).y] for i in range(68)])
 
     return landmarks
 
 def scale_face_with_landmarks(img1, img2):
+    # Get facial landmarks for both images
     landmarks1 = get_facial_landmarks(img1)
     landmarks2 = get_facial_landmarks(img2)
 
     if landmarks1 is None or landmarks2 is None:
         return None
 
+    # Calculate the mean distance between corresponding landmarks
     distances1 = np.linalg.norm(landmarks1[36:42] - landmarks1[42:48], axis=1)
     distances2 = np.linalg.norm(landmarks2[36:42] - landmarks2[42:48], axis=1)
     mean_distance1 = np.mean(distances1)
     mean_distance2 = np.mean(distances2)
 
+    # Calculate scaling factor
     scale_factor = mean_distance2 / mean_distance1
     print(scale_factor)
 
+    # Scale image 1
     resized_img1 = cv2.resize(img1, None, fx=scale_factor, fy=scale_factor)
 
     return resized_img1
@@ -77,7 +83,7 @@ def center_crop(img, dim):
 	return crop_img
 
 
-def image_scale(img1_path, img2_path):
+def image_scale(img1_path, img2_path, name=None, cnt=None):
     img1 = cv2.imread(img1_path)
     img2 = cv2.imread(img2_path)
         
@@ -98,23 +104,24 @@ def image_scale(img1_path, img2_path):
     resized_face = image_transform(resized_face)
 
     res_con = torch.cat([img1, img2, resized_face], dim=2)
-    save_image(res_con, 'temp/haha.jpg', normalize=True)
+    save_image(res_con, 'temp/' + str(cnt).zfill(10) + '.png', normalize=True)
+    # save_image(resized_face, 'datasets/FFHQ_UpScale/' + name, normalize=True)
+    transform_toPIL = transforms.ToPILImage()
+    return transform_toPIL(resized_face)
 
-    return resized_face
 
-if (__name__ == '__main__'):
-    opts = Options().parse()
+if (__name__ == "__main__"):
     with open('datasets/testPair.txt') as file:
         lines = [line.rstrip() for line in file]
         cnt = 0
         for line in lines:
             cnt += 1
             source, shape = line.split(' ') 
-            source = source.split('.')[0] + '_70.png'
-            
-            src_name = source
-            image_scale(f'{opts.src_img_dir}/{src_name}', f'{opts.ref_img_dir}/{shape}')
             print(source, shape)
+            image_scale('datasets/FFHQ_TrueScale/' + shape, 'datasets/FFHQ_Resized/' + source, source)
+            
+
+
 
 
 
